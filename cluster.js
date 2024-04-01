@@ -28,6 +28,7 @@ var _=R(/*! ./types */"./src/types.ts");!function(e){for(var R in e)N.hasOwnProp
 
 let dimensions = [];
 function drawViz(data) {
+    console.log('data',data)
     const body = document.getElementsByTagName("body")[0];
     const svgAttr = {
         "width": body.clientWidth,
@@ -45,24 +46,11 @@ function drawViz(data) {
         svg = d3.select('svg');
         document.getElementById('svg').innerHTML = "";
     }
-    /*
-    svg.append("circle")
-        .attr("cx", svgAttr.width / 2)
-        .attr("cy", svgAttr.height / 2)
-        .attr("r", 10)
-        .attr("fill", getColorFromPalette());
-    drawDiagonals();
-    */
+    
     dimensions = data.fields.tableDimension.map(td => td.id);
     graphCluster(data);
     console.info("Graph finished");
 }
-
-/*******************************************************************************
-*                                                                              *
-*                              Auxiliary functions                             *
-*                                                                              *
-*******************************************************************************/
 
 /**
  * Graph data in cluster view
@@ -72,17 +60,18 @@ function graphCluster(data) {
     const nrows = 200;
     const rows = data.tables.DEFAULT.rows.slice(0, nrows);
     const transformedData = extractGraphData(rows);
+    console.log('transformedData',transformedData);
     const nodes = extractNodes(transformedData);
+    console.log('nodes',nodes);
     const links = extractLinks(transformedData);
+    console.log('links',links);
     const minData = Math.min(...transformedData.map( i => i.value));
     const maxData = Math.max(...transformedData.map( i => i.value));
     const domain= {
         min: minData,
         max: maxData,
     };
-    //console.dir(transformedData);
-    //console.dir(nodes);
-    //console.dir(links);
+
     drawGraph(nodes, links, domain);
 }
 
@@ -98,14 +87,36 @@ function drawGraph(nodes, links, domain){
         .domain([domain.min, domain.max])
         .range([minRadius, maxRadius]);
     
-    let link = svg
+    //-----
+        // Agrega un contenedor <g> para los elementos que serán zoomables
+    const zoomableLayer = svg.append('g')
+        .attr('class', 'zoomable-layer');
+
+        // Inicializa el zoom y lo aplica al SVG
+    const zoom = d3.zoom()
+        .scaleExtent([.1, 40]) // Establece los límites de zoom
+        .translateExtent([[-1000, -1000], [width+1000, height+1000]])
+        .on('zoom', (event) => {
+            zoomableLayer.attr('transform', d3.event.transform);
+            zoomableLayer.selectAll(".dim2") //si la classe es dim2 entonces mostrar si zoom(transform.k) es mayor que 3
+                .style("opacity", d3.event.transform.k > 3 ? 1 : 0);
+        });
+    svg.call(zoom);
+
+    
+    
+    let link = zoomableLayer
         .selectAll("line")
         .data(links)
         .enter()
         .append("line")
             .style("stroke", "#aaa");
+    
 
-    let node = svg
+
+
+
+    let node = zoomableLayer
         .selectAll("circle")
         .data(nodes)
         .enter()
@@ -126,16 +137,12 @@ function drawGraph(nodes, links, domain){
                     values: [[event.id]]
                 }
                 dscc.sendInteraction(interactionId, filter, interactionData);
-            });
+            })
+//        .call(dragHandler);
+
     node.append("title")
         .text(d => d.id);
-    
-    /*
-    node.call(d3.drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended));
-    /*/
+
 
     // Create a simulation with several forces.
     const simulation = d3.forceSimulation(nodes)
@@ -160,14 +167,17 @@ function drawGraph(nodes, links, domain){
     function ended(){
         //Solo dim1 deben tener etiqueta
         const fontSize = 18;
-        const textElements = svg.selectAll("text")
-            .data(nodes.filter(i => i.dim == "dim1"))
+//        const textElements = svg.selectAll("text")
+        const textElements = zoomableLayer.selectAll("text")
+            //.data(nodes.filter(i => i.dim == "dim1"))
+            .data(nodes)
             .enter()
             .append("text")
             .attr("x", i => i.x - i.id.length*fontSize/4)
             .attr("y", i => i.y)
             .text(i => i.id)
-            .attr("opacity", 0.6)
+            .attr("opacity", i => i.dim == "dim1" ? 0.6 : 0 )
+            .attr("class", i => i.dim == "dim1" ? "dim1" : "dim2") // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
             .attr("font-size", fontSize+"px")
             .attr("fill", "#000")
             .on("click", event =>{
@@ -182,35 +192,10 @@ function drawGraph(nodes, links, domain){
                 }
                 dscc.sendInteraction(interactionId, filter, interactionData);
             });
-    }
-    const zoom = d3.zoom()
-        .scaleExtent([1, 2])
-        .on("zoom", e => {
-            svg.attr("transform", d3.event.transform);
-        });
-    svg.call(zoom);
-    // Reheat the simulation when drag starts, and fix the subject position.
-    function dragstarted(event) {
-        console.dir(event);
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        event.vx = event.x;
-        event.vy = event.y;
-    }
-    // Update the subject (dragged node) position during drag.
-    function dragged(event) {
-        console.dir(event);
-        event.vx = event.x;
-        event.vy = event.y;
+        
+
     }
 
-    // Restore the target alpha so the simulation cools after dragging ends.
-    // Unfix the subject position now that itâ€™s no longer being dragged.
-    function dragended(event) {
-        console.dir(event);
-        if (!event.active) simulation.alphaTarget(0);
-        event.vx = null;
-        event.vy = null;
-    }
 
     // When this cell is re-run, stop the previous simulation. (This doesnâ€™t
     // really matter since the target alpha is zero and the simulation will
@@ -225,6 +210,8 @@ function drawGraph(nodes, links, domain){
  */
 function extractLinks(data) {
     const links = [];
+    //aqui poner un foreach par agregar un dim0 a todos los dim 1;
+    //revisar desde data como se va transformando para poder gregar el dim0
     data.forEach(i => {
         let link = {
             source: i.dim1,
@@ -295,12 +282,6 @@ function extractGraphData(rows) {
     });
     return graphData;
 }
-
-/*******************************************************************************
-*                                                                              *
-*                                     Misc                                     *
-*                                                                              *
-*******************************************************************************/
 
 /**
  * Gets a color from the palette
