@@ -1,0 +1,96 @@
+none{body {
+  scrollbar-width: none;
+  overflow: hidden;
+}}
+
+
+.container {
+  background-color: #f5f8fa; /* Fondo similar a Twitter */
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  font-family: 'Roboto'; 
+  overflow: hidden;
+  scrollbar-width: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.container-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1da1f2; /* Color de Twitter */
+  margin-bottom: 20px;
+  margin-top: 0%;
+}
+
+.card {
+  background-color: #fff; /* Fondo blanco */
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  padding: 20px;
+  padding-top: 0%;
+  margin-bottom: 5px;
+/*  max-height: 3.6em;*/
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0px;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: bold;
+  color: #1da1f2; /* Color de Twitter */
+  margin-bottom: 0px;
+}
+
+.date {
+  font-size: 17px;
+  color: #66757f; /* Color de Twitter */
+  margin-bottom: 0px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.content {
+  font-size: 17px;
+  color: grey;
+  margin-bottom: 0px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 40px); /* El ancho máximo es el ancho de la tarjeta menos los padding */
+  display: -webkit-box;
+  -webkit-line-clamp: 5; /* Número máximo de líneas */
+  -webkit-box-orient: vertical;
+  margin-top: -18px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+
+.tag {
+  background-color: #1da1f2; /* Color de Twitter */
+  border-radius: 20px;
+  color: #fff; /* Texto blanco */
+  padding: 5px;
+  margin-right: 10px;
+  margin-bottom: 5px;
+  margin-top: 0px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* Número máximo de líneas */
+  -webkit-box-orient: vertical;
+}

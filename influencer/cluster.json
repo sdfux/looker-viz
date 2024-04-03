@@ -1,0 +1,51 @@
+{
+    "data": [
+        {
+            "id": "concepts",
+            "label": "Concepts",
+            "elements": [
+                {
+                    "id": "tableDimension",
+                    "label": "Dimension",
+                    "type": "DIMENSION",
+                    "options": {
+                        "min": 1,
+                        "max": 2
+                    }
+                },
+                {
+                    "id": "tableMetric",
+                    "label": "Metric",
+                    "type": "METRIC",
+                    "options": {
+                        "min": 1,
+                        "max": 1
+                    }
+                }
+            ]
+        }
+    ],
+    "style":[{
+        "id":"Node2",
+        "label":"Show Node 2",
+        "elements":[{
+            "id":"showNode2",
+            "label":"When to show Node2",
+            "type":"INTERVAL",
+            "defaultValue": -1
+        }]
+    },{
+        "id":"Node0",
+        "label":"Use Node 0",
+        "elements":[{
+            "id":"useNode0",
+            "label":"Use Node0 ?",
+            "type":"CHECKBOX",
+            "defaultValue": true
+        }]
+    }],
+    "interactions": [{
+        "id": "filter",
+        "supportedActions": ["FILTER"]
+    }]
+}

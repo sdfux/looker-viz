@@ -1,0 +1,25 @@
+{
+    "name": "Community Visualization",
+    "logoUrl": "https://lh3.googleusercontent.com/drive-viewer/AKGpihbY2DrzTv2WNbn9xGCNauUG0CrkAnOv88tdFI6ILvMx0VGQCjkITseA3ecgxJTAEzUrVzpw4cJN5XOd9J60HeqiH1QmyA=s2560",
+    "organization": "Hiberus Mx",
+    "organizationUrl": "https://url",
+    "termsOfServiceUrl": "https://url",
+    "supportUrl": "https://url",
+    "packageUrl": "https://url",
+    "privacyPolicyUrl": "https://url",
+    "description": "Word Cloud",
+    "devMode": true,
+    "components": [
+        {
+            "id": "wordcloud",
+            "name": "Word Cloud",
+            "iconUrl": "https://lh3.googleusercontent.com/drive-viewer/AKGpihbY2DrzTv2WNbn9xGCNauUG0CrkAnOv88tdFI6ILvMx0VGQCjkITseA3ecgxJTAEzUrVzpw4cJN5XOd9J60HeqiH1QmyA=s2560",
+            "description": "Word Cloud",
+            "resource": {
+                "js": "gs://codelab-looker/wordcloudD3/viz.js",
+                "config": "gs://codelab-looker/wordcloudD3/viz.json",
+                "css": "gs://codelab-looker/wordcloudD3/viz.css"
+            }
+        }
+    ]
+}

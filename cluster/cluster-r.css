@@ -1,0 +1,13 @@
+body {
+    background-color: #fff;
+    overflow: hidden;
+}
+
+text.dim1 {
+    font-weight: bolder;
+    font-size: 1.2em;
+}
+
+text.dim2 {
+    font-weight: normal;
+}

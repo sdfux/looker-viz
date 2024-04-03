@@ -1,0 +1,25 @@
+{
+    "name": "Brain Viz Influence",
+    "logoUrl": "https://raw.githubusercontent.com/googledatastudio/community-visualizations/master/docs/codelab/img/table-chart.png",
+    "organization": "Hiberus Mx",
+    "organizationUrl": "https://url",
+    "termsOfServiceUrl": "https://url",
+    "supportUrl": "https://url",
+    "packageUrl": "https://url",
+    "privacyPolicyUrl": "https://url",
+    "description": "Brain Influence visualization",
+    "devMode": true,
+    "components": [
+        {
+            "id": "influencer",
+            "name": "influencer",
+            "iconUrl": "https://raw.githubusercontent.com/googledatastudio/community-visualizations/master/docs/codelab/img/table-chart.png",
+            "description": "Real Word cluster.",
+            "resource": {
+                "js": "gs://codelab-looker/influencer/cluster-r.js",
+                "config": "gs://codelab-looker/influencer/cluster-r.json",
+                "css": "gs://codelab-looker/influencer/cluster-r.css"
+            }
+        }
+    ]
+}
