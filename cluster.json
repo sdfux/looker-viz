@@ -25,6 +25,25 @@
             ]
         }
     ],
+    "style":[{
+        "id":"Node2",
+        "label":"Show Node 2",
+        "elements":[{
+            "id":"showNode2",
+            "label":"When to show Node2",
+            "type":"INTERVAL",
+            "defaultValue": -1
+        }]
+    },{
+        "id":"Node0",
+        "label":"Use Node 0",
+        "elements":[{
+            "id":"useNode0",
+            "label":"Use Node0 ?",
+            "type":"CHECKBOX",
+            "defaultValue": true
+        }]
+    }],
     "interactions": [{
         "id": "filter",
         "supportedActions": ["FILTER"]

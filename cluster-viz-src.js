@@ -1,6 +1,13 @@
 let dimensions = [];
+let showDim2 = null;
+let useNode0 = true;
 function drawViz(data) {
-    console.log('data',data)
+    //0 para que siempre se vea, negativo no visible
+    showDim2 = data.style.showNode2.value;
+
+    useNode0 = data.style.useNode0.value;
+
+//    console.log('data',data)
     const body = document.getElementsByTagName("body")[0];
     const svgAttr = {
         "width": body.clientWidth,
@@ -32,11 +39,11 @@ function graphCluster(data) {
     const nrows = 200;
     const rows = data.tables.DEFAULT.rows.slice(0, nrows);
     const transformedData = extractGraphData(rows);
-    console.log('transformedData',transformedData);
+//    console.log('transformedData',transformedData);
     const nodes = extractNodes(transformedData);
-    console.log('nodes',nodes);
+//    console.log('nodes',nodes);
     const links = extractLinks(transformedData);
-    console.log('links',links);
+//    console.log('links',links);
     const minData = Math.min(...transformedData.map( i => i.value));
     const maxData = Math.max(...transformedData.map( i => i.value));
     const domain= {
@@ -69,9 +76,13 @@ function drawGraph(nodes, links, domain){
         .scaleExtent([.1, 40]) // Establece los límites de zoom
         .translateExtent([[-1000, -1000], [width+1000, height+1000]])
         .on('zoom', (event) => {
+            //console.log('d3',d3.event.transform);
             zoomableLayer.attr('transform', d3.event.transform);
+            //0 para que siempre se vea, negativo no visible
+//            console.log('showdim2',showDim2);
+            if (showDim2 >= 0 ) {
             zoomableLayer.selectAll(".dim2") //si la classe es dim2 entonces mostrar si zoom(transform.k) es mayor que 3
-                .style("opacity", d3.event.transform.k > 3 ? 1 : 0);
+                .style("opacity", d3.event.transform.k > showDim2 ? 1 : 0)};
         });
     svg.call(zoom);
 
@@ -82,7 +93,7 @@ function drawGraph(nodes, links, domain){
         .data(links)
         .enter()
         .append("line")
-            .style("stroke", "#aaa");
+            .style("stroke", "#dfdfdfb7");
     
 
 
@@ -140,16 +151,16 @@ function drawGraph(nodes, links, domain){
         //Solo dim1 deben tener etiqueta
         const fontSize = 18;
 //        const textElements = svg.selectAll("text")
-        const textElements = zoomableLayer.selectAll("text")
-            //.data(nodes.filter(i => i.dim == "dim1"))
-            .data(nodes)
+        const textElements = zoomableLayer.selectAll(".dim1")
+            .data(nodes.filter(i => i.dim == "dim1"))
             .enter()
             .append("text")
             .attr("x", i => i.x - i.id.length*fontSize/4)
             .attr("y", i => i.y)
             .text(i => i.id)
-            .attr("opacity", i => i.dim == "dim1" ? 0.6 : 0 )
-            .attr("class", i => i.dim == "dim1" ? "dim1" : "dim2") // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
+            .attr("opacity", 0.6 )
+//            .attr("class", i => i.dim == "dim1" ? "dim1" : "dim2") // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
+            .attr("class", i => i.dim ) // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
             .attr("font-size", fontSize+"px")
             .attr("fill", "#000")
             .on("click", event =>{
@@ -164,7 +175,49 @@ function drawGraph(nodes, links, domain){
                 }
                 dscc.sendInteraction(interactionId, filter, interactionData);
             });
+
+            
+            const textElementsDim2 = zoomableLayer.selectAll(".dim2")
+            .data(nodes.filter(i => i.dim == "dim2"))
+            .enter()
+            .append("text")
+            .attr("x", i => i.x - i.id.length*fontSize/4)
+            .attr("y", i => i.y)
+            .text(i => i.id)
+            .attr("opacity", 0)
+//            .attr("class", i => i.dim == "dim1" ? "dim1" : "dim2") // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
+            .attr("class", i => i.dim ) // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
+            .attr("font-size", fontSize+"px")
+            .attr("fill", "#000")
         
+        //Como  al sacar solamente el bbox por el zoomableLayer.selectAll(node)
+        //no estaba trayendo el bbox mas que de el primer objeto que encontraba,
+        //y si se hacia por el grupo, el bbox salia muy grande ya que el texto de dim2 es muy grande(al menos ahorita que se usaba la descripcion)
+        //entonces se selecciono solo el .node y .dim1, y se hizo una iteracion con cada uno
+        //para poder sacar el bbox real.
+        //Zoom para que se vea todo.
+        const bodyWidth = dscc.getWidth()-50;
+        const bodyHeight = dscc.getHeight()-50;
+        const nodesAndText = zoomableLayer.selectAll(".node, .dim1");
+        const bbox = nodesAndText.node().getBBox();
+        nodesAndText.each(function(){
+            const nodeBBox = this.getBBox();
+            bbox.x = Math.min(bbox.x, nodeBBox.x);
+            bbox.y = Math.min(bbox.y, nodeBBox.y);
+            bbox.width = Math.max(bbox.width, nodeBBox.x + nodeBBox.width - bbox.x);
+            bbox.height = Math.max(bbox.height, nodeBBox.y + nodeBBox.height - bbox.y);
+        });
+//        console.log('bbox',bbox)
+        
+        const scaleFactor = Math.min(bodyWidth / bbox.width, bodyHeight / bbox.height);
+        const offsetX = (bodyWidth - bbox.width * scaleFactor) / 2 - bbox.x * scaleFactor;
+        const offsetY = (bodyHeight - bbox.height * scaleFactor) / 2 - bbox.y * scaleFactor;
+        let zoomTransform = d3.zoomIdentity.translate(offsetX, offsetY).scale(scaleFactor);
+
+        //Esta linea es para que se aplique el zoom al "zoom handler", si no lo aplicas
+        //a la hora de usar el scroll se "resetea", osea comienza desde donde se crea (o donde se quedó la ultima vez)
+        svg.transition().duration(2000).call(zoom.transform, zoomTransform);
+
 
     }
 
@@ -191,6 +244,14 @@ function extractLinks(data) {
             value: i.value,
         }
         links.push(link);
+        if (useNode0) {
+            link = {
+                source: "dim0",
+                target: i.dim1,
+                value: 1
+            }
+            links.push(link);
+        };
     });
     return links;
 }
@@ -204,6 +265,9 @@ function extractNodes(data) {
     let group = 1;
     const nodeInfo = [];
     const nodes = [];
+    if (useNode0) {
+        nodes.push({ id: "dim0", group: 0, r: 10, dim: "dim0" });
+    };
     data.forEach(i => {
         let node1 = nodes.find(n => n.id == i.dim1);
         let currGroup = nodeInfo.find(n => n.id == i.dim1);
