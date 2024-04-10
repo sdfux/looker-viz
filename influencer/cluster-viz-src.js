@@ -82,7 +82,7 @@ function drawGraph(nodes, links, domain){
 //            console.log('showdim2',showDim2);
             if (showDim2 >= 0 ) {
             zoomableLayer.selectAll(".dim2") //si la classe es dim2 entonces mostrar si zoom(transform.k) es mayor que 3
-                .style("opacity", d3.event.transform.k > showDim2 ? 1 : 0)};
+                .style("opacity", d3.event.transform.k > showDim2 ? .6 : 0)};
         });
     svg.call(zoom);
 
@@ -151,18 +151,19 @@ function drawGraph(nodes, links, domain){
         //Solo dim1 deben tener etiqueta
         const fontSize = 18;
 //        const textElements = svg.selectAll("text")
-        const textElements = zoomableLayer.selectAll(".dim1")
-            .data(nodes.filter(i => i.dim == "dim1"))
+        const textElements = zoomableLayer.selectAll(".dim1, dim2")
+            .data(nodes)
             .enter()
             .append("text")
             .attr("x", i => i.x - i.id.length*fontSize/4)
             .attr("y", i => i.y)
             .text(i => i.id)
             .attr("opacity", 0.6 )
-//            .attr("class", i => i.dim == "dim1" ? "dim1" : "dim2") // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
+//            .attr("opacity", i => i.dim == "dim1" ? .6 : 0) // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
             .attr("class", i => i.dim ) // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
             .attr("font-size", fontSize+"px")
-            .attr("fill", "#000")
+//            .attr("fill", "#000")
+            .attr("fill", i => i.dim == "dim1" ? "#000" : "#808080") // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
             .on("click", event =>{
                 const interactionId = "filter";
                 //const dimensions = ["qt_viyz5ik9ed", "qt_einoejk9ed"];
@@ -176,7 +177,7 @@ function drawGraph(nodes, links, domain){
                 dscc.sendInteraction(interactionId, filter, interactionData);
             });
 
-            
+           /* 
             const textElementsDim2 = zoomableLayer.selectAll(".dim2")
             .data(nodes.filter(i => i.dim == "dim2"))
             .enter()
@@ -185,17 +186,18 @@ function drawGraph(nodes, links, domain){
             .attr("y", i => i.y)
             .text(i => i.id)
             .attr("opacity", 0)
-//            .attr("class", i => i.dim == "dim1" ? "dim1" : "dim2") // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
             .attr("class", i => i.dim ) // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
             .attr("font-size", fontSize+"px")
             .attr("fill", "#000")
         
+            */
+
         //Como  al sacar solamente el bbox por el zoomableLayer.selectAll(node)
         //no estaba trayendo el bbox mas que de el primer objeto que encontraba,
         //y si se hacia por el grupo, el bbox salia muy grande ya que el texto de dim2 es muy grande(al menos ahorita que se usaba la descripcion)
         //entonces se selecciono solo el .node y .dim1, y se hizo una iteracion con cada uno
         //para poder sacar el bbox real.
-        //Zoom para que se vea todo.
+        //--------Zoom para que se vea todo.------
         const bodyWidth = dscc.getWidth()-50;
         const bodyHeight = dscc.getHeight()-50;
         const nodesAndText = zoomableLayer.selectAll(".node, .dim1");
