@@ -30,6 +30,10 @@ let dimensions = [];
 let showDim2 = null;
 let useNode0 = true;
 function drawViz(data) {
+    //eliminar nulos
+    data.tables.DEFAULT.rows = data.tables.DEFAULT.rows.filter((d,i) => d[0] != null && d[1] != null )
+    console.log('data',data);
+
     //0 para que siempre se vea, negativo no visible
     showDim2 = data.style.showNode2.value;
 
@@ -186,8 +190,8 @@ function drawGraph(nodes, links, domain){
             .attr("x", i => i.x - i.id.length*fontSize/4)
             .attr("y", i => i.y)
             .text(i => i.id)
-            .attr("opacity", 0.6 )
-//            .attr("opacity", i => i.dim == "dim1" ? .6 : 0) // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
+//            .attr("opacity", 0.6 )
+            .attr("opacity", i => i.dim == "dim1" ? .6 : 0) // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
             .attr("class", i => i.dim ) // asignamos class, para poder mostrar u ocultar dim2 cuando llegue a cierto zoom
             .attr("font-size", fontSize+"px")
 //            .attr("fill", "#000")

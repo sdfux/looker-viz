@@ -77,7 +77,11 @@ function drawViz(data){
   
   const dataMax = +data.tables.DEFAULT[0].tableMetric[0];
   const dataMin = +data.tables.DEFAULT[data.tables.DEFAULT.length - 1].tableMetric[0];
-  const datos = data.tables.DEFAULT.map(function(d) {
+  
+  
+  const datos = data.tables.DEFAULT
+  .filter(d => d.tableDimension[0] != null && d.tableDimension[1] != null) // Filtrar elementos no nulos
+  .map(function(d) {
     let porcM = '';
     if (data.tables.DEFAULT.length >= 3){
        porcM = (d.tableMetric[0]-dataMin)/(dataMax-dataMin);
@@ -111,13 +115,16 @@ function drawViz(data){
   // This function takes the output of 'layout' above and draw the words
   // Wordcloud features that are THE SAME from one word to the other can be here
   function draw(datos) {
+
+    let lengthDatos = datos.length;
+//    console.log("datos",datos);
     if (datos.length < 3) {
       //iColor=['#ffffff','#5abce9'];
       iColor=[fontcolormax, fontcolormed];
     } else {
-      let tmpiColor = interpolarColores(fontcolormax,fontcolormed,Math.ceil(datos.length/2));
+      let tmpiColor = interpolarColores(fontcolormax,fontcolormed,Math.ceil(lengthDatos/2));
       iColor = tmpiColor;
-      tmpiColor = interpolarColores(fontcolormed,fontcolormin,Math.ceil(datos.length/2));
+      tmpiColor = interpolarColores(fontcolormed,fontcolormin,Math.ceil(lengthDatos/2));
       iColor.push(...tmpiColor);
     }
 

@@ -12,6 +12,9 @@ let offsetY = 50;
 
 
 function drawViz(data) {
+//eliminar nulos
+data.tables.DEFAULT.rows = data.tables.DEFAULT.rows.filter((d,i) => d[0] != null && d[1] != null )
+//console.log('data',data);
     
 cantnodos = data.style.nodocant.value;
 offsetX = data.style.offsetx.value;
