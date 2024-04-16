@@ -13,6 +13,9 @@ none{body {
   font-family: 'Roboto'; 
   overflow: hidden;
   scrollbar-width: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
 }
 
 .container::-webkit-scrollbar {
@@ -72,6 +75,8 @@ none{body {
   -webkit-line-clamp: 5; /* Número máximo de líneas */
   -webkit-box-orient: vertical;
   margin-top: -18px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 .tags {

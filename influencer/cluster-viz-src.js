@@ -4,7 +4,7 @@ let useNode0 = true;
 function drawViz(data) {
     //eliminar nulos
     data.tables.DEFAULT.rows = data.tables.DEFAULT.rows.filter((d,i) => d[0] != null && d[1] != null )
-    console.log('data',data);
+ //   console.log('data',data);
 
     //0 para que siempre se vea, negativo no visible
     showDim2 = data.style.showNode2.value;

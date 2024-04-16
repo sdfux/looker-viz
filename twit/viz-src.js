@@ -78,6 +78,10 @@ function createCard(title, date, content, tags, style) {
   container.style.fontSize = style.contentsize.value + "px"; 
   container.style.fontFamily = style.contentfontfamily.value; 
   container.setAttribute("shape-rendering","crispEdges");
+  container.style.textRendering = "optimizeLegibility"; // Mejora la legibilidad del texto
+  container.style.webkitFontSmoothing = "antialiased"; // Específico de WebKit
+  container.style.fontSmoothing = "antialiased"; // General para todos los navegadores
+
 //  .attr("shape-rendering","crispEdges")
 
   const containerTitle = document.createElement('h2');
