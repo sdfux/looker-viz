@@ -1,21 +1,16 @@
 var titlelink = [];
 function drawViz(data) {
 
-//  console.log("data",data);
+ // console.log("data",data);
 
   document.body.innerHTML = "";
   var body = document.body;
-
-//  const titles = ['TITULO 1', 'TITULO 2'];
-//  const dates = ['07/03/2024', '08/03/2024'];
-//  const contents = ['Contenido de la tarjeta 1...', 'Contenido de la tarjeta 2...'];
-//  const tagsList = [['#hash1', '#hash2', '#hash3'], ['#hash4', '#hash5', '#hash6']];
-
 
   var titles = []; 
   var contents = []; 
   var dates = []; 
   var tagsList = [];
+  titlelink = [];
 
 //  console.log('data',data);
   var mir = +data.style.minrange.value-1;
@@ -35,9 +30,16 @@ function drawViz(data) {
     if ( typeof data.tables.DEFAULT.rows[i][0] == "undefined") {
       continue;
     }
-    titles.push(data.tables.DEFAULT.rows[i][0]);
+    if ( data.tables.DEFAULT.rows[i][0] == null ) {
+      titles.push('mención de redes sociales');
+    }
+    else {
+      titles.push(data.tables.DEFAULT.rows[i][0]);
+    }
     contents.push(data.tables.DEFAULT.rows[i][1]);
-    dates.push(data.tables.DEFAULT.rows[i][2]);
+      var tempdate = fecha(data.tables.DEFAULT.rows[i][2])
+      dates.push(tempdate);
+  //  dates.push(data.tables.DEFAULT.rows[i][2]);
     var tag = data.tables.DEFAULT.rows[i][3];
     titlelink.push(data.tables.DEFAULT.rows[i][4]);
     //-----------------------------
@@ -69,6 +71,41 @@ function drawViz(data) {
 // Subscribe to data and style changes. Use the table format for data.
 dscc.subscribeToData(drawViz, { transform: dscc.tableTransform });
 
+function fecha(f) {
+  let year = f.slice(0,4);
+  let month = f.slice(4,6);
+  let day = f.slice(6,8);
+
+
+  return `${day}/${month}/${year}`;
+}
+
+function fechaA(f) {
+  //YYYY/MM/DD  y DD/MM/YYYY twitter
+  //YYYY/MM/DD  otros
+  sep = f.includes('/') ? '/' : '-';
+  spl = f.split(sep);
+
+  let d = 0;
+  let year = '';
+
+    if ( spl[0].length == 4 ) {
+      year = spl[0]
+      d = 2;
+    }
+
+   if ( spl[2].length == 4 ) {
+      year = spl[2]
+      d = 0;
+    }
+
+  let day = spl[d];
+  let month = spl[1];
+  
+
+  return `${day}/${month}/${year}`;
+
+}
 
 function createCard(title, date, content, tags, style) {
 
