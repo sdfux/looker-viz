@@ -1,0 +1,25 @@
+{
+    "name": "Brain Viz Cluster",
+    "logoUrl": "https://raw.githubusercontent.com/googledatastudio/community-visualizations/master/docs/codelab/img/table-chart.png",
+    "organization": "Hiberus Mx",
+    "organizationUrl": "https://url",
+    "termsOfServiceUrl": "https://url",
+    "supportUrl": "https://url",
+    "packageUrl": "https://url",
+    "privacyPolicyUrl": "https://url",
+    "description": "Brain cluster visualization",
+    "devMode": true,
+    "components": [
+        {
+            "id": "influencer2",
+            "name": "influencer2",
+            "iconUrl": "https://raw.githubusercontent.com/googledatastudio/community-visualizations/master/docs/codelab/img/table-chart.png",
+            "description": "Influencer2",
+            "resource": {
+                "js": "gs://codelab-looker/influencer2/cluster.js",
+                "config": "gs://codelab-looker/influencer2/cluster.json",
+                "css": "gs://codelab-looker/influencer2/cluster.css"
+            }
+        }
+    ]
+}
