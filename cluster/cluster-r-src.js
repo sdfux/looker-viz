@@ -14,7 +14,7 @@ let offsetY = 50;
 function drawViz(data) {
 //eliminar nulos
 data.tables.DEFAULT.rows = data.tables.DEFAULT.rows.filter((d,i) => d[0] != null && d[1] != null )
-//console.log('data',data);
+console.log('data',data);
     
 cantnodos = data.style.nodocant.value;
 offsetX = data.style.offsetx.value;
@@ -234,6 +234,7 @@ function drawGraph(nodes, links){
                     concepts: [dimension],
                     values: [[event.id]]
                 };
+                console.log('event',event);
                 dscc.sendInteraction(interactionId, filter, interactionData);
             });
     }

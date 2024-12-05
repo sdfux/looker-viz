@@ -11,8 +11,13 @@ function drawViz(data) {
   var dates = []; 
   var tagsList = [];
   titlelink = [];
+  var sep = data.style.separador.value;
+ // var regex = data.style.regex.value;
+  const regex = {
+    string: data.style.regex.value,  // La expresión regular como string
+    group: data.style.grupo.value,                     // Número de grupo que deseas capturar
+  }; 
 
-//  console.log('data',data);
   var mir = +data.style.minrange.value-1;
   const minrange = mir < 0 ? 0 : mir;
   var mar = +data.style.maxrange.value-1;
@@ -42,26 +47,18 @@ function drawViz(data) {
   //  dates.push(data.tables.DEFAULT.rows[i][2]);
     var tag = data.tables.DEFAULT.rows[i][3];
     titlelink.push(data.tables.DEFAULT.rows[i][4]);
-    //-----------------------------
-    //agregar el url [i][4];
-//    console.log('tag', i, tag);
-    if (tag.charAt(0) === ',') {
-      tag = tag.substring(1);
-    }
-    if (tag) {
-      if (tag.includes(",")) {
-        tags = tag.split(',');
-      } else {
-        tags = [data.tables.DEFAULT.rows[i][3]];
-      }
+    
 
-      tags = tags.filter(n => n);
-      tagsList.push(tags);
-    }
-  }
- //console.log('titles',titles);
- //console.log('url',titlelink);
-  const container = createCard(titles,dates,contents,tagsList,data.style);
+   if (data.style.separador.value ) {
+    tags = tag.split(sep);
+    tags = tags.filter(n => n);
+    tagsList.push(tags);
+   } else {
+    tagsList.push(tag);
+   }
+    
+}
+  const container = createCard(titles,dates,contents,tagsList,data.style,regex);
 
   
   body.appendChild(container);
@@ -107,8 +104,13 @@ function fechaA(f) {
 
 }
 
-function createCard(title, date, content, tags, style) {
+function createCard(title, date, content, tags, style, regex) {
 
+//  regexStr = "(.*?)(\\s*-\\s*.*)";
+//console.log('reegx',regex)
+  const regexstr = new RegExp(regex.string, "g");
+
+  
 //  var body = document.body;
   const container = document.createElement('div');
   container.classList.add('container');
@@ -164,16 +166,16 @@ function createCard(title, date, content, tags, style) {
     if ( typeof tags[i] !== "undefined" && tags.length > 0) {
 //      console.log('tags',tags)
 //      console.log('tagsi',tags[i])
-    for (var tag of tags[i]) {
-//    console.log("tag",i,tag);
-      let pos = tag.indexOf('-');
-      tag = tag.substring(0,pos);
+        for (var tag of tags[i]) {
+          if (regex.string) {
+            tag = [...tag.matchAll(regexstr)].map(match => match[regex.group].trim());
+          } 
 
-      const tagElement = document.createElement('span');
-      tagElement.classList.add('tag');
-      tagElement.textContent = tag;
-      tagsContainer.appendChild(tagElement);
-    }
+          const tagElement = document.createElement('span');
+          tagElement.classList.add('tag');
+          tagElement.textContent = tag;
+          tagsContainer.appendChild(tagElement);
+        }
     }
 
     card.appendChild(tagsContainer);

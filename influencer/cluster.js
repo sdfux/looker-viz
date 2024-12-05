@@ -30,6 +30,7 @@ let dimensions = [];
 let showDim2 = null;
 let useNode0 = true;
 function drawViz(data) {
+    console.log('data',data);
     //eliminar nulos
     data.tables.DEFAULT.rows = data.tables.DEFAULT.rows.filter((d,i) => d[0] != null && d[1] != null )
  //   console.log('data',data);
@@ -59,8 +60,10 @@ function drawViz(data) {
     }
     
     dimensions = data.fields.tableDimension.map(td => td.id);
+    console.log('data',data);
     graphCluster(data);
     console.info("Graph finished");
+    console.log('data',data);
 }
 
 /**
@@ -74,7 +77,7 @@ function graphCluster(data) {
 //    console.log('transformedData',transformedData);
     const nodes = extractNodes(transformedData);
 //    console.log('nodes',nodes);
-    const links = extractLinks(transformedData);
+    const links = extractLinks(transformedData,nodes);
 //    console.log('links',links);
     const minData = Math.min(...transformedData.map( i => i.value));
     const maxData = Math.max(...transformedData.map( i => i.value));
@@ -128,7 +131,23 @@ function drawGraph(nodes, links, domain){
             .style("stroke", "#dfdfdfb7");
     
 
-
+    // Agregar el comportamiento de arrastre a los nodos
+    const dragHandler = d3.drag()
+        .on("start", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0.3).restart(); // Recalcular la simulación en arrastre
+            d.fx = d.x;
+            d.fy = d.y;
+            console.log('ddddd',d);
+        })
+        .on("drag", (event, d) => {
+            d.fx = event.x;
+            d.fy = event.y;
+        })
+        .on("end", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0); // Dejar de recalcular la simulación al soltar
+            d.fx = null;
+            d.fy = null;
+        });
 
 
     let node = zoomableLayer
@@ -153,7 +172,7 @@ function drawGraph(nodes, links, domain){
                 }
                 dscc.sendInteraction(interactionId, filter, interactionData);
             })
-//        .call(dragHandler);
+        .call(dragHandler);
 
     node.append("title")
         .text(d => d.id);
@@ -267,17 +286,24 @@ function drawGraph(nodes, links, domain){
  * @param {object[]} data with the links
  * @returns {object[]} List of links
  */
-function extractLinks(data) {
+function extractLinks(data,nodes) {
     const links = [];
     //aqui poner un foreach par agregar un dim0 a todos los dim 1;
     //revisar desde data como se va transformando para poder gregar el dim0
     data.forEach(i => {
-        let link = {
-            source: i.dim1,
-            target: i.dim2,
-            value: i.value,
+        let node1 = nodes.find(n => n.id == i.dim1);
+        let node2 = nodes.find(n => n.id == i.dim2);
+        
+        // Solo crear enlaces entre nodos del mismo grupo
+        if (node1 && node2 && node1.group === node2.group) {
+            let link = {
+                source: i.dim1,
+                target: i.dim2,
+                value: i.value,
+            }
+            links.push(link);
         }
-        links.push(link);
+        /*
         if (useNode0) {
             link = {
                 source: "dim0",
@@ -285,7 +311,7 @@ function extractLinks(data) {
                 value: 1
             }
             links.push(link);
-        };
+        };*/
     });
     return links;
 }

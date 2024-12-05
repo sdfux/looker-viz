@@ -1,0 +1,133 @@
+function drawViz(data) {
+
+  rows = data.tables.DEFAULT.rows.filter((d,i) => d[0] != null && d[1] != null )
+
+
+
+  console.log('data',data);
+  // Especifica las dimensiones del gráfico.
+  const width = 928;
+  const height = 680;
+
+  // Escala de colores.
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  // Procesar los datos provenientes de Looker Studio
+  // data.tables.DEFAULT contiene la tabla de datos
+//  const nodes = [];
+//  const links = [];
+
+  // Extraer nodos y enlaces desde los datos proporcionados por Looker Studio
+//  console.log('rows',data.tables.DEFAULT.rows);
+//  const rows = data.tables.DEFAULT.rows.slice(0,200);
+  const nodes = rows.map(d => ({...d}));
+//  const nodes = data.nodes.map(d => ({...d}));
+//  const links = data.links.map(d => ({...d}));
+
+const links = rows.map(row => ({
+  source: row[0],  // valor en la posición 0 (source)
+  target: row[1],  // valor en la posición 1 (target)
+  value: row[2],   // valor en la posición 2 (value)
+}));
+
+
+
+console.log('rows',nodes)
+console.log('rows',links)
+
+
+
+/*
+  rows.forEach(row => {
+    // Asume que las columnas son id, group, source, target y value
+    const nodeId = row["dimension"][0];  // Cambia a la dimensión correspondiente
+    const group = row["metric"][0];  // Cambia al campo correspondiente
+    const source = row["dimension"][1];  // Nodo origen
+    const target = row["dimension"][2];  // Nodo destino
+    const value = row["metric"][1];  // Valor del enlace
+
+    // Agregar los nodos al array (asegúrate de no duplicar nodos)
+    if (!nodes.some(n => n.id === nodeId)) {
+      nodes.push({ id: nodeId, group: group });
+    }
+
+    // Agregar enlaces al array
+    links.push({ source: source, target: target, value: value });
+  });
+*/
+  // Crear la simulación de fuerza
+  const simulation = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id(d => d.id))
+    .force("charge", d3.forceManyBody())
+    .force("x", d3.forceX())
+    .force("y", d3.forceY());
+
+  // Crear el contenedor SVG
+  const svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("viewBox", [-width / 2, -height / 2, width, height])
+    .attr("style", "max-width: 100%; height: auto;");
+
+  // Agregar líneas para cada enlace
+  const link = svg.append("g")
+    .attr("stroke", "#999")
+    .attr("stroke-opacity", 0.6)
+    .selectAll("line")
+    .data(links)
+    .enter().append("line")
+    .attr("stroke-width", d => Math.sqrt(d.value));
+
+  // Agregar círculos para cada nodo
+  const node = svg.append("g")
+    .attr("stroke", "#fff")
+    .attr("stroke-width", 1.5)
+    .selectAll("circle")
+    .data(nodes)
+    .enter().append("circle")
+    .attr("r", 5)
+    .attr("fill", d => color(d.group));
+
+  node.append("title")
+    .text(d => d.id);
+
+  // Agregar comportamiento de arrastre
+  node.call(d3.drag()
+    .on("start", dragstarted)
+    .on("drag", dragged)
+    .on("end", dragended));
+
+  // Actualizar la posición de nodos y enlaces en cada tick de la simulación
+  simulation.on("tick", () => {
+    link
+      .attr("x1", d => d.source.x)
+      .attr("y1", d => d.source.y)
+      .attr("x2", d => d.target.x)
+      .attr("y2", d => d.target.y);
+
+    node
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y);
+  });
+
+  // Funciones de arrastre
+  function dragstarted(event) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    event.subject.fx = event.subject.x;
+    event.subject.fy = event.subject.y;
+  }
+
+  function dragged(event) {
+    event.subject.fx = event.x;
+    event.subject.fy = event.y;
+  }
+
+  function dragended(event) {
+    if (!event.active) simulation.alphaTarget(0);
+    event.subject.fx = null;
+    event.subject.fy = null;
+  }
+}
+
+// Suscribirse a cambios de datos y estilos en Looker Studio
+dscc.subscribeToData(drawViz, { transform: dscc.tableTransform });

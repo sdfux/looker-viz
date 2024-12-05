@@ -571,6 +571,7 @@ const handleInteraction = (val, dimensions) => {
 
 
 function drawViz(data) {
+    console.log('data',data);
     fontMin = data.style.minfont.value;
     fontMax = data.style.maxfont.value;
     colorI = data.style.colorinterior.value.color;

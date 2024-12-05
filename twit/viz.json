@@ -72,6 +72,32 @@
                 }]
             }
         ] 
+    },{
+        "id": "tags",
+        "label": "Separador de tags",
+        "elements": [
+            {
+                "id": "separador",
+                "label": "Separador",
+                "type": "TEXTINPUT",
+                "defaultValue": ","
+            },
+            {
+                "id": "regex",
+                "label": "Regex",
+                "type": "TEXTINPUT",
+                "defaultValue": "(.*?)(\\s*-\\s*.*)"
+            },
+            {
+                "id": "grupo",
+                "label": "Grupo",
+                "type": "INTERVAL",
+                "defaultValue": 1,
+                "options": [{
+                    "min":1
+                }]
+            }
+        ] 
     }
     ],
     "interactions": [{
